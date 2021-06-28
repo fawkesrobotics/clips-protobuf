@@ -4,6 +4,7 @@
  *
  *  Created: Tue Apr 16 13:41:13 2013
  *  Copyright  2013-2014  Tim Niemueller [www.niemueller.de]
+ *             2021       Till Hofmann <hofmann@kbsg.rwth-aachen.de>
  ****************************************************************************/
 
 /*  Redistribution and use in source and binary forms, with or without
@@ -37,12 +38,12 @@
 #ifndef _PROTOBUF_CLIPS_COMMUNICATOR_H_
 #define _PROTOBUF_CLIPS_COMMUNICATOR_H_
 
-#include <core/threading/mutex.h>
 #include <protobuf_comm/server.h>
 
 #include <clipsmm.h>
 #include <list>
 #include <map>
+#include <mutex>
 
 namespace protobuf_comm {
 class ProtobufStreamClient;
@@ -59,10 +60,10 @@ class ClipsProtobufCommunicator
 {
 public:
 	ClipsProtobufCommunicator(CLIPS::Environment *env,
-	                          fawkes::Mutex &     env_mutex,
+	                          std::mutex &        env_mutex,
 	                          fawkes::Logger *    logger = NULL);
 	ClipsProtobufCommunicator(CLIPS::Environment *      env,
-	                          fawkes::Mutex &           env_mutex,
+	                          std::mutex &              env_mutex,
 	                          std::vector<std::string> &proto_path,
 	                          fawkes::Logger *          logger = NULL);
 	~ClipsProtobufCommunicator();
@@ -207,7 +208,7 @@ private:
 
 private:
 	CLIPS::Environment *clips_;
-	fawkes::Mutex &     clips_mutex_;
+	std::mutex &        clips_mutex_;
 
 	fawkes::Logger *logger_;
 
@@ -223,8 +224,8 @@ private:
 	boost::signals2::signal<void(long int, std::shared_ptr<google::protobuf::Message>)>
 	  sig_peer_sent_;
 
-	fawkes::Mutex map_mutex_;
-	long int      next_client_id_;
+	std::mutex map_mutex_;
+	long int   next_client_id_;
 
 	std::map<long int, protobuf_comm::ProtobufStreamServer::ClientID>         server_clients_;
 	typedef std::map<protobuf_comm::ProtobufStreamServer::ClientID, long int> RevServerClientMap;
