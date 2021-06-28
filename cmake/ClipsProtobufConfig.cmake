@@ -1,0 +1,7 @@
+include(CMakeFindDependencyMacro)
+find_dependency(Protobuf)
+find_dependency(ProtobufComm)
+find_dependency(spdlog)
+include(FindPkgConfig)
+pkg_check_modules(clipsmm REQUIRED IMPORTED_TARGET clipsmm-1.0)
+include("${CMAKE_CURRENT_LIST_DIR}/ClipsProtobufTargets.cmake")

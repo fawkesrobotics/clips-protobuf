@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(clips_protobuf)
+project(
+  clips_protobuf
+  VERSION 0.9.0
+  DESCRIPTION "Read and write protobuf messages from within CLIPS")
+
+include(GNUInstallDirs)
 
 find_package(Protobuf REQUIRED)
 find_package(ProtobufComm REQUIRED)
@@ -12,3 +17,27 @@ target_link_libraries(
   clips_protobuf protobuf::libprotobuf ProtobufComm::protobuf_comm
   PkgConfig::clipsmm spdlog::spdlog)
 target_include_directories(clips_protobuf PUBLIC include)
+
+install(
+  TARGETS clips_protobuf
+  EXPORT ClipsProtobufTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(DIRECTORY include/clips_protobuf
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/ClipsProtobufConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+
+install(
+  EXPORT ClipsProtobufTargets
+  FILE ClipsProtobufTargets.cmake
+  NAMESPACE ClipsProtobuf::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ClipsProtobuf)
+
+install(FILES cmake/ClipsProtobufConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/ClipsProtobufConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ClipsProtobuf)
