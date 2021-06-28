@@ -59,13 +59,10 @@ namespace protobuf_clips {
 class ClipsProtobufCommunicator
 {
 public:
-	ClipsProtobufCommunicator(CLIPS::Environment *env,
-	                          std::mutex &        env_mutex,
-	                          fawkes::Logger *    logger = NULL);
+	ClipsProtobufCommunicator(CLIPS::Environment *env, std::mutex &env_mutex);
 	ClipsProtobufCommunicator(CLIPS::Environment *      env,
 	                          std::mutex &              env_mutex,
-	                          std::vector<std::string> &proto_path,
-	                          fawkes::Logger *          logger = NULL);
+	                          std::vector<std::string> &proto_path);
 	~ClipsProtobufCommunicator();
 
 	void enable_server(int port);
@@ -209,8 +206,6 @@ private:
 private:
 	CLIPS::Environment *clips_;
 	std::mutex &        clips_mutex_;
-
-	fawkes::Logger *logger_;
 
 	protobuf_comm::MessageRegister *     message_register_;
 	protobuf_comm::ProtobufStreamServer *server_;

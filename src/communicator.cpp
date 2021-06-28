@@ -40,6 +40,7 @@
 #include <protobuf_comm/client.h>
 #include <protobuf_comm/peer.h>
 #include <protobuf_comm/server.h>
+#include <spdlog/spdlog.h>
 
 #include <boost/format.hpp>
 
@@ -61,12 +62,9 @@ namespace protobuf_clips {
 /** Constructor.
  * @param env CLIPS environment to which to provide the protobuf functionality
  * @param env_mutex mutex to lock when operating on the CLIPS environment.
- * @param logger optional logger for informational output
  */
-ClipsProtobufCommunicator::ClipsProtobufCommunicator(CLIPS::Environment *env,
-                                                     std::mutex &        env_mutex,
-                                                     fawkes::Logger *    logger)
-: clips_(env), clips_mutex_(env_mutex), logger_(logger), server_(NULL), next_client_id_(0)
+ClipsProtobufCommunicator::ClipsProtobufCommunicator(CLIPS::Environment *env, std::mutex &env_mutex)
+: clips_(env), clips_mutex_(env_mutex), server_(NULL), next_client_id_(0)
 {
 	message_register_ = new MessageRegister();
 	setup_clips();
@@ -76,13 +74,11 @@ ClipsProtobufCommunicator::ClipsProtobufCommunicator(CLIPS::Environment *env,
  * @param env CLIPS environment to which to provide the protobuf functionality
  * @param env_mutex mutex to lock when operating on the CLIPS environment.
  * @param proto_path proto path passed to a newly instantiated message register
- * @param logger optional logger for informational output
  */
 ClipsProtobufCommunicator::ClipsProtobufCommunicator(CLIPS::Environment *      env,
                                                      std::mutex &              env_mutex,
-                                                     std::vector<std::string> &proto_path,
-                                                     fawkes::Logger *          logger)
-: clips_(env), clips_mutex_(env_mutex), logger_(logger), server_(NULL), next_client_id_(0)
+                                                     std::vector<std::string> &proto_path)
+: clips_(env), clips_mutex_(env_mutex), server_(NULL), next_client_id_(0)
 {
 	message_register_ = new MessageRegister(proto_path);
 	setup_clips();
@@ -350,10 +346,7 @@ ClipsProtobufCommunicator::clips_pb_register_type(std::string full_name)
 		message_register_->add_message_type(full_name);
 		return CLIPS::Value("TRUE", CLIPS::TYPE_SYMBOL);
 	} catch (std::runtime_error &e) {
-		// if (logger_) {
-		//  logger_->log_error("CLIPS-Protobuf", "Registering type %s failed: %s",
-		//                     full_name.c_str(), e.what());
-		//}
+		SPDLOG_ERROR("CLIPS-Protobuf: Registering type {} failed: {}", full_name, e.what());
 		return CLIPS::Value("FALSE", CLIPS::TYPE_SYMBOL);
 	}
 }
@@ -365,11 +358,7 @@ ClipsProtobufCommunicator::clips_pb_create(std::string full_name)
 		std::shared_ptr<google::protobuf::Message> m = message_register_->new_message_for(full_name);
 		return CLIPS::Value(new std::shared_ptr<google::protobuf::Message>(m));
 	} catch (std::runtime_error &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Cannot create message of type %s: %s",
-		//                    full_name.c_str(), e.what());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Cannot create message of type {}: {}", full_name, e.what());
 		return CLIPS::Value(new std::shared_ptr<google::protobuf::Message>());
 	}
 }
@@ -499,28 +488,19 @@ ClipsProtobufCommunicator::clips_pb_field_value(void *msgptr, std::string field_
 	std::shared_ptr<google::protobuf::Message> *m =
 	  static_cast<std::shared_ptr<google::protobuf::Message> *>(msgptr);
 	if (!(m && *m)) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Invalid message when setting %s",
-		//                    field_name.c_str());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Invalid message when setting {}", field_name);
 		return CLIPS::Value("INVALID-MESSAGE", CLIPS::TYPE_SYMBOL);
 	}
 
 	const Descriptor *     desc  = (*m)->GetDescriptor();
 	const FieldDescriptor *field = desc->FindFieldByName(field_name);
 	if (!field) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Field %s of %s does not exist",
-		//                    field_name.c_str(), (*m)->GetTypeName().c_str());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Field {} of {} does not exist", field_name, (*m)->GetTypeName());
 		return CLIPS::Value("DOES-NOT-EXIST", CLIPS::TYPE_SYMBOL);
 	}
 	const Reflection *refl = (*m)->GetReflection();
 	if (field->type() != FieldDescriptor::TYPE_MESSAGE && !refl->HasField(**m, field)) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Field %s of %s not set",
-		//                    field_name.c_str(), (*m)->GetTypeName().c_str());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Field {} of {} not set", field_name, (*m)->GetTypeName());
 		return CLIPS::Value("NOT-SET", CLIPS::TYPE_SYMBOL);
 	}
 	switch (field->type()) {
@@ -571,10 +551,7 @@ ClipsProtobufCommunicator::clips_pb_set_field(void *       msgptr,
 	const Descriptor *     desc  = (*m)->GetDescriptor();
 	const FieldDescriptor *field = desc->FindFieldByName(field_name);
 	if (!field) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Could not find field %s",
-		//                    field_name.c_str());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Could not find field {}", field_name);
 		return;
 	}
 	const Reflection *refl = (*m)->GetReflection();
@@ -609,25 +586,21 @@ ClipsProtobufCommunicator::clips_pb_set_field(void *       msgptr,
 			if (enumval) {
 				refl->SetEnum(m->get(), field, enumval);
 			} else {
-				// if (logger_) {
-				//  logger_->log_warn("CLIPS-Protobuf",
-				//                    "%s: cannot set invalid "
-				//                    "enum value '%s' on '%s'",
-				//                    (*m)->GetTypeName().c_str(),
-				//                    value.as_string().c_str(), field_name.c_str());
-				//}
+				SPDLOG_WARN("CLIPS-Protobuf: {}: cannot set invalid enum value '{}' on '{}'",
+				            (*m)->GetTypeName(),
+				            value.as_string(),
+				            field_name);
 			}
 		} break;
 		default: throw std::logic_error("Unknown protobuf field type encountered");
 		}
 	} catch (std::logic_error &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Failed to set field %s of %s: %s "
-		//                    "(type %d, as string %s)",
-		//                    field_name.c_str(), (*m)->GetTypeName().c_str(),
-		//                    e.what(), value.type(), to_string(value).c_str());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Failed to set field {} of {}: {} (type {}, as string {})",
+		            field_name,
+		            (*m)->GetTypeName(),
+		            e.what(),
+		            value.type(),
+		            to_string(value));
 	}
 }
 
@@ -644,10 +617,7 @@ ClipsProtobufCommunicator::clips_pb_add_list(void *       msgptr,
 	const Descriptor *     desc  = (*m)->GetDescriptor();
 	const FieldDescriptor *field = desc->FindFieldByName(field_name);
 	if (!field) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Could not find field %s",
-		//                    field_name.c_str());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Could not find field {}", field_name);
 		return;
 	}
 	const Reflection *refl = (*m)->GetReflection();
@@ -685,11 +655,10 @@ ClipsProtobufCommunicator::clips_pb_add_list(void *       msgptr,
 		default: throw std::logic_error("Unknown protobuf field type encountered");
 		}
 	} catch (std::logic_error &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Failed to add field %s of %s: %s",
-		//                    field_name.c_str(), (*m)->GetTypeName().c_str(),
-		//                    e.what());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Failed to add field {} of {}: {}",
+		            field_name,
+		            (*m)->GetTypeName().c_str(),
+		            e.what());
 	}
 }
 
@@ -730,11 +699,7 @@ ClipsProtobufCommunicator::clips_pb_send(long int client_id, void *msgptr)
 	std::shared_ptr<google::protobuf::Message> *m =
 	  static_cast<std::shared_ptr<google::protobuf::Message> *>(msgptr);
 	if (!(m && *m)) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf", "Cannot send to %li: invalid
-		//  message",
-		//                    client_id);
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Cannot send to {}: invalid message", client_id);
 		return;
 	}
 
@@ -759,17 +724,13 @@ ClipsProtobufCommunicator::clips_pb_send(long int client_id, void *msgptr)
 			//     client_id, (*m)->GetTypeName().c_str());
 		}
 	} catch (google::protobuf::FatalException &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Profobuf",
-		//                    "Failed to send message of type %s: %s",
-		//                    (*m)->GetTypeName().c_str(), e.what());
-		//}
+		SPDLOG_WARN("CLIPS-Profobuf: Failed to send message of type {}: {}",
+		            (*m)->GetTypeName().c_str(),
+		            e.what());
 	} catch (std::runtime_error &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Failed to send message of type %s: %s",
-		//                    (*m)->GetTypeName().c_str(), e.what());
-		//}
+		SPDLOG_WARN("CLIPS-Profobuf: Failed to send message of type {}: {}",
+		            (*m)->GetTypeName().c_str(),
+		            e.what());
 	}
 }
 
@@ -779,10 +740,7 @@ ClipsProtobufCommunicator::clips_pb_tostring(void *msgptr)
 	std::shared_ptr<google::protobuf::Message> *m =
 	  static_cast<std::shared_ptr<google::protobuf::Message> *>(msgptr);
 	if (!(m && *m)) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Cannot convert message to string: invalid message");
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Cannot convert message to string: invalid message");
 		return "";
 	}
 
@@ -795,10 +753,7 @@ ClipsProtobufCommunicator::clips_pb_broadcast(long int peer_id, void *msgptr)
 	std::shared_ptr<google::protobuf::Message> *m =
 	  static_cast<std::shared_ptr<google::protobuf::Message> *>(msgptr);
 	if (!(m && *m)) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Cannot send broadcast: invalid message");
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Cannot send broadcast: invalid message");
 		return;
 	}
 
@@ -806,22 +761,13 @@ ClipsProtobufCommunicator::clips_pb_broadcast(long int peer_id, void *msgptr)
 	if (peers_.find(peer_id) == peers_.end())
 		return;
 
-	// logger_->log_info("CLIPS-Protobuf", "Broadcasting %s",
-	// (*m)->GetTypeName().c_str());
+	SPDLOG_INFO("CLIPS-Protobuf: Broadcasting {}", (*m)->GetTypeName().c_str());
 	try {
 		peers_[peer_id]->send(*m);
 	} catch (google::protobuf::FatalException &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Failed to broadcast message of type %s: %s",
-		//                    (*m)->GetTypeName().c_str(), e.what());
-		//}
+		SPDLOG_WARN("Failed to broadcast message of type {}: {}", (*m)->GetTypeName(), e.what());
 	} catch (std::runtime_error &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Failed to broadcast message of type %s: %s",
-		//                    (*m)->GetTypeName().c_str(), e.what());
-		//}
+		SPDLOG_WARN("Failed to broadcast message of type {}: {}", (*m)->GetTypeName(), e.what());
 	}
 
 	sig_peer_sent_(peer_id, *m);
@@ -830,7 +776,7 @@ ClipsProtobufCommunicator::clips_pb_broadcast(long int peer_id, void *msgptr)
 void
 ClipsProtobufCommunicator::clips_pb_disconnect(long int client_id)
 {
-	// logger_->log_info("CLIPS-Protobuf", "Disconnecting client %li", client_id);
+	SPDLOG_INFO("CLIPS-Protobuf: Disconnecting client {}", client_id);
 
 	try {
 		std::lock_guard<std::mutex> lock(map_mutex_);
@@ -845,11 +791,7 @@ ClipsProtobufCommunicator::clips_pb_disconnect(long int client_id)
 			clients_.erase(client_id);
 		}
 	} catch (std::runtime_error &e) {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Failed to disconnect from client %li: %s", client_id,
-		//                    e.what());
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Failed to disconnect from client {}: {}", client_id, e.what());
 	}
 }
 
@@ -983,17 +925,11 @@ ClipsProtobufCommunicator::clips_assert_message(std::pair<std::string, unsigned 
 		CLIPS::Fact::pointer new_fact = clips_->assert_fact(fact);
 
 		if (!new_fact) {
-			// if (logger_) {
-			//  logger_->log_warn("CLIPS-Protobuf",
-			//                    "Asserting protobuf-msg fact failed");
-			//}
+			SPDLOG_WARN("CLIPS-Protobuf: Asserting protobuf-msg fact failed");
 			delete static_cast<std::shared_ptr<google::protobuf::Message> *>(ptr);
 		}
 	} else {
-		// if (logger_) {
-		//  logger_->log_warn("CLIPS-Protobuf",
-		//                    "Did not get template, did you load protobuf.clp?");
-		//}
+		SPDLOG_WARN("CLIPS-Protobuf: Did not get template, did you load protobuf.clp?");
 	}
 }
 
@@ -1115,11 +1051,10 @@ ClipsProtobufCommunicator::handle_peer_recv_error(long int                      
                                                   boost::asio::ip::udp::endpoint &endpoint,
                                                   std::string                     msg)
 {
-	// if (logger_) {
-	//  logger_->log_warn(
-	//      "CLIPS-Protobuf", "Failed to receive peer message from %s:%u: %s",
-	//      endpoint.address().to_string().c_str(), endpoint.port(), msg.c_str());
-	//}
+	SPDLOG_WARN("CLIPS-Protobuf: Failed to receive peer message from {}:{}: {}",
+	            endpoint.address().to_string(),
+	            endpoint.port(),
+	            msg);
 }
 
 /** Handle error during peer message processing.
@@ -1128,10 +1063,7 @@ ClipsProtobufCommunicator::handle_peer_recv_error(long int                      
 void
 ClipsProtobufCommunicator::handle_peer_send_error(long int peer_id, std::string msg)
 {
-	// if (logger_) {
-	//  logger_->log_warn("CLIPS-Protobuf", "Failed to send peer message: %s",
-	//                    msg.c_str());
-	//}
+	SPDLOG_WARN("CLIPS-Protobuf: Failed to send peer message: {}", msg);
 }
 
 void
