@@ -41,3 +41,11 @@ install(
 install(FILES cmake/ClipsProtobufConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/ClipsProtobufConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ClipsProtobuf)
+
+set(PKG_CONFIG_REQUIRES "protobuf protobuf_comm spdlog clipsmm-1.0")
+
+configure_file(clips_protobuf.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/clips_protobuf.pc @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/clips_protobuf.pc
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
