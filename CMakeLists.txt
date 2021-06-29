@@ -20,6 +20,8 @@ target_include_directories(
   clips_protobuf PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_compile_definitions(
   clips_protobuf PRIVATE SHAREDIR="${CMAKE_INSTALL_FULL_DATADIR}/clips")
+set_target_properties(clips_protobuf PROPERTIES SOVERSION
+                                                ${PROJECT_VERSION_MAJOR})
 
 install(
   TARGETS clips_protobuf
