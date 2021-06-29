@@ -31,6 +31,8 @@ install(
 install(DIRECTORY include/clips_protobuf
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+install(FILES src/protobuf.clp DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/clips)
+
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/ClipsProtobufConfigVersion.cmake
