@@ -43,10 +43,20 @@
 #include <spdlog/spdlog.h>
 
 #include <boost/format.hpp>
+#include <filesystem>
+#include <string>
 
 using namespace google::protobuf;
 using namespace protobuf_comm;
 using namespace boost::placeholders;
+
+namespace {
+#ifdef SHAREDIR
+const std::filesystem::path sharedir(SHAREDIR);
+#else
+const std::filesystem::path sharedir{"clips"};
+#endif
+} // namespace
 
 namespace protobuf_clips {
 
@@ -193,6 +203,7 @@ ClipsProtobufCommunicator::setup_clips()
 	ADD_FUNCTION("pb-disconnect",
 	             (sigc::slot<void, long int>(
 	               sigc::mem_fun(*this, &ClipsProtobufCommunicator::clips_pb_disconnect))));
+	clips_->batch_evaluate((sharedir / "protobuf.clp").string());
 }
 
 /** Enable protobuf stream server.

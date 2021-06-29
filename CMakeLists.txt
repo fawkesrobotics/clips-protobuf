@@ -17,6 +17,8 @@ target_link_libraries(
   clips_protobuf protobuf::libprotobuf ProtobufComm::protobuf_comm
   PkgConfig::clipsmm spdlog::spdlog)
 target_include_directories(clips_protobuf PUBLIC include)
+target_compile_definitions(
+  clips_protobuf PRIVATE SHAREDIR="${CMAKE_INSTALL_FULL_DATADIR}/clips")
 
 install(
   TARGETS clips_protobuf
