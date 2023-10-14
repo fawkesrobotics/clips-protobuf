@@ -123,7 +123,7 @@ ClipsProtobufCommunicator::~ClipsProtobufCommunicator()
 void
 ClipsProtobufCommunicator::setup_clips()
 {
-	std::lock_guard<std::mutex> lock(clips_mutex_);
+	//std::lock_guard<std::mutex> lock(clips_mutex_);
 
 	ADD_FUNCTION("pb-register-type",
 	             (sigc::slot<CLIPS::Value, std::string>(
