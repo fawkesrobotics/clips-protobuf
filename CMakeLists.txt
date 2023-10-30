@@ -16,8 +16,16 @@ add_library(clips_protobuf SHARED src/communicator.cpp)
 target_link_libraries(
   clips_protobuf protobuf::libprotobuf ProtobufComm::protobuf_comm
   PkgConfig::clipsmm spdlog::spdlog)
-target_include_directories(
-  clips_protobuf PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+#target_include_directories(
+#  clips_protobuf PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_include_directories(clips_protobuf
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>)
+target_include_directories(clips_protobuf
+    INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>)
 target_compile_definitions(
   clips_protobuf PRIVATE SHAREDIR="${CMAKE_INSTALL_FULL_DATADIR}/clips")
 set_target_properties(clips_protobuf PROPERTIES SOVERSION
