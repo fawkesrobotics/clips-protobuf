@@ -608,7 +608,7 @@ ClipsProtobufCommunicator::clips_pb_set_field(void *       msgptr,
 		            field_name,
 		            (*m)->GetTypeName(),
 		            e.what(),
-		            value.type(),
+		            to_string(value.type()),
 		            to_string(value));
 	}
 }
