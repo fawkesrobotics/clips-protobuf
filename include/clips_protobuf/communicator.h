@@ -40,7 +40,7 @@
 
 #include <protobuf_comm/server.h>
 
-#include <clips.h>
+#include <clips_ns/clips.h>
 #include <list>
 #include <map>
 #include <mutex>
