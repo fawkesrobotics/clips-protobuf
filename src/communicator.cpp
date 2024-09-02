@@ -119,7 +119,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   // std::lock_guard<std::mutex> lock(clips_mutex_);
   using namespace clips;
   clips::AddUDF(
-      clips_, "pb-register-type", "b", 1, 1, "sy",
+      clips_, "pb-register-type", "b", 1, 1, ";sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -133,7 +133,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-register-type");
 
   clips::AddUDF(
-      clips_, "pb-field-names", "m", 1, 1, "e",
+      clips_, "pb-field-names", "m", 1, 1, ";e",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -147,7 +147,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-field-names");
 
   clips::AddUDF(
-      clips_, "pb-field-type", "y", 2, 2, "e;sy",
+      clips_, "pb-field-type", "y", 2, 2, ";e;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -164,7 +164,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-field-type");
 
   clips::AddUDF(
-      clips_, "pb-has-field", "b", 2, 2, "e;sy",
+      clips_, "pb-has-field", "b", 2, 2, ";e;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -181,7 +181,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-has-field");
 
   clips::AddUDF(
-      clips_, "pb-field-label", "y", 2, 2, "e;sy",
+      clips_, "pb-field-label", "y", 2, 2, ";e;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -198,7 +198,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-field-label");
 
   clips::AddUDF(
-      clips_, "pb-field-value", "*", 2, 2, "e;sy",
+      clips_, "pb-field-value", "*", 2, 2, ";e;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -215,7 +215,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-field-value");
 
   clips::AddUDF(
-      clips_, "pb-field-list", "ym", 2, 2, "e;sy",
+      clips_, "pb-field-list", "ym", 2, 2, ";e;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -232,7 +232,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-field-list");
 
   clips::AddUDF(
-      clips_, "pb-field-is-list", "b", 2, 2, "e;sy",
+      clips_, "pb-field-is-list", "b", 2, 2, ";e;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -249,7 +249,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-field-is-list");
 
   clips::AddUDF(
-      clips_, "pb-create", "e", 1, 1, "sy",
+      clips_, "pb-create", "e", 1, 1, ";sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -262,7 +262,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-create");
 
   clips::AddUDF(
-      clips_, "pb-destroy", "v", 1, 1, "e",
+      clips_, "pb-destroy", "v", 1, 1, ";e",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -275,7 +275,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-destroy");
 
   clips::AddUDF(
-      clips_, "pb-ref", "e", 1, 1, "e",
+      clips_, "pb-ref", "e", 1, 1, ";e",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -288,7 +288,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-ref");
 
   clips::AddUDF(
-      clips_, "pb-set-field", "v", 3, 3, "e;sy;*",
+      clips_, "pb-set-field", "v", 3, 3, ";e;sy;*",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -307,7 +307,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-set-field");
 
   clips::AddUDF(
-      clips_, "pb-add-list", "v", 3, 3, "e;sy;*",
+      clips_, "pb-add-list", "v", 3, 3, ";e;sy;*",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -327,7 +327,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-add-list");
 
   clips::AddUDF(
-      clips_, "pb-send", "v", 2, 2, "l;e",
+      clips_, "pb-send", "v", 2, 2, ";l;e",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -345,7 +345,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-send");
 
   clips::AddUDF(
-      clips_, "pb-tostring", "sy", 1, 1, "e",
+      clips_, "pb-tostring", "sy", 1, 1, ";e",
       [](clips::Environment *env, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -365,7 +365,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-tostring");
 
   clips::AddUDF(
-      clips_, "pb-server-enable", "v", 1, 1, "l",
+      clips_, "pb-server-enable", "v", 1, 1, ";l",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -391,7 +391,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-server-disable");
 
   clips::AddUDF(
-      clips_, "pb-peer-create", "l", 2, 2, "s;l",
+      clips_, "pb-peer-create", "l", 2, 2, ";s;l",
       [](clips::Environment *env, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -409,7 +409,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-peer-create");
 
   clips::AddUDF(
-      clips_, "pb-peer-create-local", "l", 3, 3, "sy;l;l",
+      clips_, "pb-peer-create-local", "l", 3, 3, ";sy;l;l",
       [](clips::Environment *env, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -430,7 +430,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-peer-create-local");
 
   clips::AddUDF(
-      clips_, "pb-peer-create-crypto", "l", 4, 4, "sy;l;sy;sy",
+      clips_, "pb-peer-create-crypto", "l", 4, 4, ";sy;l;sy;sy",
       [](clips::Environment *env, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -452,7 +452,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-peer-create-crypto");
 
   clips::AddUDF(
-      clips_, "pb-peer-create-local-crypto", "l", 5, 5, "sy;l;l;sy;sy",
+      clips_, "pb-peer-create-local-crypto", "l", 5, 5, ";sy;l;l;sy;sy",
       [](clips::Environment *env, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -478,7 +478,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-peer-create-local-crypto");
 
   clips::AddUDF(
-      clips_, "pb-peer-destroy", "v", 1, 1, "l",
+      clips_, "pb-peer-destroy", "v", 1, 1, ";l",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -493,7 +493,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-peer-destroy");
 
   clips::AddUDF(
-      clips_, "pb-peer-setup-crypto", "v", 3, 3, "l;sy;sy",
+      clips_, "pb-peer-setup-crypto", "v", 3, 3, ";l;sy;sy",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -512,7 +512,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-peer-setup-crypto");
 
   clips::AddUDF(
-      clips_, "pb-broadcast", "v", 2, 2, "l;e",
+      clips_, "pb-broadcast", "v", 2, 2, ";l;e",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -530,7 +530,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-broadcast");
 
   clips::AddUDF(
-      clips_, "pb-connect", "l", 2, 2, "sy;l",
+      clips_, "pb-connect", "l", 2, 2, ";sy;l",
       [](clips::Environment *env, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
@@ -548,7 +548,7 @@ void ClipsProtobufCommunicator::setup_clips() {
   functions_.push_back("pb-connect");
 
   clips::AddUDF(
-      clips_, "pb-disconnect", "v", 1, 1, "l",
+      clips_, "pb-disconnect", "v", 1, 1, ";l",
       [](clips::Environment * /*env*/, clips::UDFContext *udfc,
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
