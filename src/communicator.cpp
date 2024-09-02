@@ -125,7 +125,11 @@ void ClipsProtobufCommunicator::setup_clips() {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue full_name;
-        clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &full_name);
+        if(!clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &full_name)) {
+          SPDLOG_ERROR("pb-register-type: unexpected types, expected addr");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out =
             instance->clips_pb_register_type(full_name.lexemeValue->contents);
       },
@@ -139,7 +143,11 @@ void ClipsProtobufCommunicator::setup_clips() {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr)) {
+          SPDLOG_ERROR("pb-field-names: unexpected types, expected addr");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out = instance->clips_pb_field_names(
             msgptr.externalAddressValue->contents);
       },
@@ -152,10 +160,13 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &field_name);
+        clips::UDFValue msgptr, field_name;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name)) {
+          SPDLOG_ERROR("pb-field-type: unexpected types, expected addr;lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out =
             instance->clips_pb_field_type(msgptr.externalAddressValue->contents,
                                           field_name.lexemeValue->contents);
@@ -169,10 +180,13 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
+        clips::UDFValue msgptr, field_name;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name)) {
+          SPDLOG_ERROR("pb-has-field: unexpected types, expected addr;lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out =
             instance->clips_pb_has_field(msgptr.externalAddressValue->contents,
                                          field_name.lexemeValue->contents);
@@ -186,10 +200,13 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
+        clips::UDFValue msgptr, field_name;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name)) {
+          SPDLOG_ERROR("pb-field-label: unexpected types, expected addr;lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out = instance->clips_pb_field_label(
             msgptr.externalAddressValue->contents,
             field_name.lexemeValue->contents);
@@ -203,10 +220,13 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
+        clips::UDFValue msgptr, field_name;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name)) {
+          SPDLOG_ERROR("pb-field-value: unexpected types, expected addr;lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out = instance->clips_pb_field_value(
             msgptr.externalAddressValue->contents,
             field_name.lexemeValue->contents);
@@ -220,10 +240,13 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
+        clips::UDFValue msgptr, field_name;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name)) {
+          SPDLOG_ERROR("pb-field-list: unexpected types, expected addr;lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out =
             instance->clips_pb_field_list(msgptr.externalAddressValue->contents,
                                           field_name.lexemeValue->contents);
@@ -237,10 +260,13 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
+        clips::UDFValue msgptr, field_name;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name)) {
+          SPDLOG_ERROR("pb-field-is-list: unexpected types, expected addr;lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out = instance->clips_pb_field_is_list(
             msgptr.externalAddressValue->contents,
             field_name.lexemeValue->contents);
@@ -255,7 +281,11 @@ void ClipsProtobufCommunicator::setup_clips() {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue full_name;
-        clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &full_name);
+        if(!clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &full_name)) {
+          SPDLOG_ERROR("pb-create: unexpected types, expected lex");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out = instance->clips_pb_create(full_name.lexemeValue->contents);
       },
       "clips_pb_create", this);
@@ -268,7 +298,11 @@ void ClipsProtobufCommunicator::setup_clips() {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr)) {
+          SPDLOG_ERROR("pb-destroy: unexpected types, expected addr");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         instance->clips_pb_destroy(msgptr.externalAddressValue->contents);
       },
       "clips_pb_destroy", this);
@@ -281,7 +315,11 @@ void ClipsProtobufCommunicator::setup_clips() {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr)) {
+          SPDLOG_ERROR("pb-ref: unexpected types, expected addr");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         *out = instance->clips_pb_ref(msgptr.externalAddressValue->contents);
       },
       "clips_pb_ref", this);
@@ -293,13 +331,14 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
-
-        clips::UDFValue value;
-        clips::UDFNthArgument(udfc, 3, ANY_TYPE_BITS, &value);
+        clips::UDFValue msgptr, field_name, value;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name) ||
+           !clips::UDFNthArgument(udfc, 3, ANY_TYPE_BITS, &value)) {
+          SPDLOG_ERROR("pb-set-field: unexpected types, expected addr;lex;*");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         instance->clips_pb_set_field(msgptr.externalAddressValue->contents,
                                      field_name.lexemeValue->contents, value);
       },
@@ -312,14 +351,14 @@ void ClipsProtobufCommunicator::setup_clips() {
          clips::UDFValue *out) {
         ClipsProtobufCommunicator *instance =
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
-        clips::UDFValue msgptr;
-        clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr);
-        clips::UDFValue field_name;
-        clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name);
-
-        clips::UDFValue value;
-        using namespace clips;
-        clips::UDFNthArgument(udfc, 3, ANY_TYPE_BITS, &value);
+        clips::UDFValue msgptr, field_name, value;
+        if(!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT, &msgptr) ||
+           !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &field_name) ||
+           !clips::UDFNthArgument(udfc, 3, ANY_TYPE_BITS, &value)) {
+          SPDLOG_ERROR("pb-add-list: unexpected types, expected addr;lex;*");
+          clips::UDFThrowError(udfc);
+          return;
+        }
         instance->clips_pb_add_list(msgptr.externalAddressValue->contents,
                                     field_name.lexemeValue->contents, value);
       },
@@ -336,6 +375,8 @@ void ClipsProtobufCommunicator::setup_clips() {
         if (!clips::UDFNthArgument(udfc, 1, clips::INTEGER_BIT, &client_id) ||
             !clips::UDFNthArgument(udfc, 2, clips::EXTERNAL_ADDRESS_BIT,
                                    &msgptr)) {
+          SPDLOG_ERROR("pb-send: unexpected types, expected int;addr");
+          clips::UDFThrowError(udfc);
           return;
         }
         instance->clips_pb_send(client_id.integerValue->contents,
@@ -353,7 +394,9 @@ void ClipsProtobufCommunicator::setup_clips() {
         clips::UDFValue msgptr;
         if (!clips::UDFNthArgument(udfc, 1, clips::EXTERNAL_ADDRESS_BIT,
                                    &msgptr)) {
+          SPDLOG_ERROR("pb-tostring: unexpected types, expected addr");
           out->lexemeValue = clips::CreateSymbol(env, "INVALID-MESSAGE");
+          clips::UDFThrowError(udfc);
           return;
         }
         out->lexemeValue = clips::CreateString(
@@ -372,6 +415,8 @@ void ClipsProtobufCommunicator::setup_clips() {
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue port;
         if (!clips::UDFNthArgument(udfc, 1, clips::INTEGER_BIT, &port)) {
+          SPDLOG_ERROR("pb-server-enable: unexpected types, expected int");
+          clips::UDFThrowError(udfc);
           return;
         }
         instance->enable_server(port.integerValue->contents);
@@ -399,6 +444,8 @@ void ClipsProtobufCommunicator::setup_clips() {
         clips::UDFValue address, port;
         if (!clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &address) ||
             !clips::UDFNthArgument(udfc, 2, clips::INTEGER_BIT, &port)) {
+          SPDLOG_ERROR("pb-peer-create: unexpected types, expected lex;int");
+          clips::UDFThrowError(udfc);
           return;
         }
         out->integerValue = clips::CreateInteger(
@@ -417,7 +464,9 @@ void ClipsProtobufCommunicator::setup_clips() {
         clips::UDFValue address, send_port, recv_port;
         if (!clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &address) ||
             !clips::UDFNthArgument(udfc, 2, clips::INTEGER_BIT, &send_port) ||
-            !clips::UDFNthArgument(udfc, 4, clips::INTEGER_BIT, &recv_port)) {
+            !clips::UDFNthArgument(udfc, 3, clips::INTEGER_BIT, &recv_port)) {
+          SPDLOG_ERROR("pb-peer-create-local: unexpected types, expected lex;int;int");
+          clips::UDFThrowError(udfc);
           return;
         }
         out->integerValue =
@@ -440,6 +489,8 @@ void ClipsProtobufCommunicator::setup_clips() {
             !clips::UDFNthArgument(udfc, 2, clips::INTEGER_BIT, &port) ||
             !clips::UDFNthArgument(udfc, 4, LEXEME_BITS, &crypto_key) ||
             !clips::UDFNthArgument(udfc, 5, LEXEME_BITS, &cipher)) {
+          SPDLOG_ERROR("pb-peer-create-crypto: unexpected types, expected lex;int;lex,lex");
+          clips::UDFThrowError(udfc);
           return;
         }
         out->integerValue = clips::CreateInteger(
@@ -464,6 +515,8 @@ void ClipsProtobufCommunicator::setup_clips() {
             !clips::UDFNthArgument(udfc, 4, clips::INTEGER_BIT, &recv_port) ||
             !clips::UDFNthArgument(udfc, 5, LEXEME_BITS, &crypto_key) ||
             !clips::UDFNthArgument(udfc, 6, LEXEME_BITS, &cipher)) {
+            SPDLOG_ERROR("pb-peer-create-local-crypto: unexpected types, expected lex;int;int,lex,lex");
+          clips::UDFThrowError(udfc);
           return;
         }
         out->integerValue = clips::CreateInteger(
@@ -485,6 +538,8 @@ void ClipsProtobufCommunicator::setup_clips() {
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue peer_id;
         if (!clips::UDFNthArgument(udfc, 1, clips::INTEGER_BIT, &peer_id)) {
+            SPDLOG_ERROR("pb-peer-destroy: unexpected types, expected int");
+          clips::UDFThrowError(udfc);
           return;
         }
         instance->clips_pb_peer_destroy(peer_id.integerValue->contents);
@@ -502,6 +557,8 @@ void ClipsProtobufCommunicator::setup_clips() {
         if (!clips::UDFNthArgument(udfc, 1, clips::INTEGER_BIT, &peer_id) ||
             !clips::UDFNthArgument(udfc, 2, LEXEME_BITS, &crypto_key) ||
             !clips::UDFNthArgument(udfc, 3, LEXEME_BITS, &cipher)) {
+            SPDLOG_ERROR("pb-peer-setup-crypto: unexpected types, expected int;lex;lex");
+          clips::UDFThrowError(udfc);
           return;
         }
         instance->clips_pb_peer_setup_crypto(peer_id.integerValue->contents,
@@ -521,6 +578,8 @@ void ClipsProtobufCommunicator::setup_clips() {
         if (!clips::UDFNthArgument(udfc, 1, clips::INTEGER_BIT, &peer_id) ||
             !clips::UDFNthArgument(udfc, 2, clips::EXTERNAL_ADDRESS_BIT,
                                    &msgptr)) {
+            SPDLOG_ERROR("pb-broadcast: unexpected types, expected int;addr");
+          clips::UDFThrowError(udfc);
           return;
         }
         instance->clips_pb_broadcast(peer_id.integerValue->contents,
@@ -538,6 +597,8 @@ void ClipsProtobufCommunicator::setup_clips() {
         clips::UDFValue host, port, timeout;
         if (!clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &host) ||
             !clips::UDFNthArgument(udfc, 2, clips::INTEGER_BIT, &port)) {
+            SPDLOG_ERROR("pb-connect: unexpected types, expected lex;int");
+          clips::UDFThrowError(udfc);
           return;
         }
         out->integerValue = clips::CreateInteger(
@@ -555,6 +616,8 @@ void ClipsProtobufCommunicator::setup_clips() {
             static_cast<ClipsProtobufCommunicator *>(udfc->context);
         clips::UDFValue peer_id;
         if (!clips::UDFNthArgument(udfc, 1, clips::INTEGER_BIT, &peer_id)) {
+          SPDLOG_ERROR("pb-disconnect: unexpected types, expected int");
+          clips::UDFThrowError(udfc);
           return;
         }
         instance->clips_pb_disconnect(peer_id.integerValue->contents);
