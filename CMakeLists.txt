@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(
   clips_protobuf
-  VERSION 0.9.0
+  VERSION 1.0.0
   DESCRIPTION "Read and write protobuf messages from within CLIPS")
 
 include(GNUInstallDirs)
@@ -10,18 +10,26 @@ include(GNUInstallDirs)
 find_package(Protobuf REQUIRED)
 find_package(ProtobufComm REQUIRED)
 find_package(spdlog REQUIRED)
-include(FindPkgConfig)
-pkg_check_modules(clipsmm REQUIRED IMPORTED_TARGET clipsmm-1.0)
+find_package(clips REQUIRED)
 add_library(clips_protobuf SHARED src/communicator.cpp)
 target_link_libraries(
   clips_protobuf protobuf::libprotobuf ProtobufComm::protobuf_comm
-  PkgConfig::clipsmm spdlog::spdlog)
-target_include_directories(
-  clips_protobuf PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+  ClipsNS::libclips_ns spdlog::spdlog)
+#target_include_directories(
+#  clips_protobuf PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_include_directories(clips_protobuf
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>)
+target_include_directories(clips_protobuf
+    INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>)
 target_compile_definitions(
   clips_protobuf PRIVATE SHAREDIR="${CMAKE_INSTALL_FULL_DATADIR}/clips")
 set_target_properties(clips_protobuf PROPERTIES SOVERSION
                                                 ${PROJECT_VERSION_MAJOR})
+set_property(TARGET clips_protobuf PROPERTY CXX_STANDARD 20)
 
 install(
   TARGETS clips_protobuf
@@ -49,7 +57,7 @@ install(FILES cmake/ClipsProtobufConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/ClipsProtobufConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ClipsProtobuf)
 
-set(PKG_CONFIG_REQUIRES "protobuf protobuf_comm spdlog clipsmm-1.0")
+set(PKG_CONFIG_REQUIRES "protobuf protobuf_comm spdlog")
 
 configure_file(clips_protobuf.pc.in
                ${CMAKE_CURRENT_BINARY_DIR}/clips_protobuf.pc @ONLY)
