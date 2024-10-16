@@ -97,8 +97,6 @@ ClipsProtobufCommunicator::ClipsProtobufCommunicator(
 /** Destructor. */
 ClipsProtobufCommunicator::~ClipsProtobufCommunicator() {
   {
-    std::lock_guard<std::mutex> lock(clips_mutex_);
-
     for (auto f : functions_) {
       clips::RemoveUDF(clips_, f.c_str());
     }
