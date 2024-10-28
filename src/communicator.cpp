@@ -510,9 +510,9 @@ void ClipsProtobufCommunicator::setup_clips() {
             cipher;
         if (!clips::UDFNthArgument(udfc, 1, LEXEME_BITS, &address) ||
             !clips::UDFNthArgument(udfc, 2, clips::INTEGER_BIT, &send_port) ||
-            !clips::UDFNthArgument(udfc, 4, clips::INTEGER_BIT, &recv_port) ||
-            !clips::UDFNthArgument(udfc, 5, LEXEME_BITS, &crypto_key) ||
-            !clips::UDFNthArgument(udfc, 6, LEXEME_BITS, &cipher)) {
+            !clips::UDFNthArgument(udfc, 3, clips::INTEGER_BIT, &recv_port) ||
+            !clips::UDFNthArgument(udfc, 4, LEXEME_BITS, &crypto_key) ||
+            !clips::UDFNthArgument(udfc, 5, LEXEME_BITS, &cipher)) {
             SPDLOG_ERROR("pb-peer-create-local-crypto: unexpected types, expected lex;int;int,lex,lex");
           clips::UDFThrowError(udfc);
           return;
@@ -813,6 +813,9 @@ clips::UDFValue ClipsProtobufCommunicator::clips_pb_field_names(void *msgptr) {
   std::shared_ptr<google::protobuf::Message> *m =
       static_cast<std::shared_ptr<google::protobuf::Message> *>(msgptr);
   clips::UDFValue field_names;
+  field_names.begin = 0;
+  field_names.range = -1;
+
   if (!*m)
     return field_names;
 
@@ -1334,12 +1337,14 @@ ClipsProtobufCommunicator::clips_pb_field_list(void *msgptr,
                                clips::CreateSymbol(clips_, "DOES-NOT-EXIST")};
   }
   clips::UDFValue ret;
+  ret.begin = 0;
+  ret.range = -1;
   clips::MultifieldBuilder *mb = clips::CreateMultifieldBuilder(clips_, 10);
   if (field->label() == FieldDescriptor::LABEL_REQUIRED ||
       field->label() == FieldDescriptor::LABEL_OPTIONAL) {
     clips::UDFValue aux_val = clips_pb_field_value(msgptr, field_name);
     clips::MBAppend(mb, static_cast<clips::CLIPSValue *>(aux_val.value));
-    ret = clips::UDFValue{.multifieldValue = clips::MBCreate(mb)};
+    ret.multifieldValue = clips::MBCreate(mb);
     MBDispose(mb);
     return ret;
   }
@@ -1404,7 +1409,8 @@ ClipsProtobufCommunicator::clips_pb_field_list(void *msgptr,
       throw std::logic_error("Unknown protobuf field type encountered");
     }
   }
-  ret = clips::UDFValue{.multifieldValue = clips::MBCreate(mb)};
+  auto val = clips::MBCreate(mb);
+  ret .multifieldValue = val;
   MBDispose(mb);
   return ret;
 }
